@@ -584,7 +584,7 @@ function wholeArea (ob) {
 				eleAngle: ob.eleAngle,
 				beginAngle: sA,
 				flag: offsetIndex
-			})
+			});
 			setRing({
 				container: ob.container,
 				startAngle: sA,
@@ -592,7 +592,8 @@ function wholeArea (ob) {
 				innerRadius: ob.beginRadius + 2*ob.eleRadius + 30,
 				color: area[i].color,
 				areaName: area[i].name
-			})
+			});
+			
 		}
 
 	};
@@ -609,6 +610,63 @@ function wholeArea (ob) {
 
 	return _wholeArea;
 
+}
+
+/*画出整个雷达图
+	attr: {
+		container: 容器,
+		beginArray: 分区数组，元素为{begin: value, len: value}
+		radius: 雷达半径
+		eleAngle: 每个单元所占的角度
+	}
+*/
+function wholeRadar (ob) {
+	console.log(window.normalRate)
+	var _wholeRadar = {};
+	var radarArray = [];
+
+	for (var i = 0; i < beginArray.length; i++) {
+
+		var b = ob.beginArray[i].begin,
+			l = ob.beginArray[i].len,
+			offsetIndex = i,
+			tempRate = {top: [], bottom: []};
+
+		sA= ob.eleAngle * (b + 0.05) + 6/360 * 2*Math.PI* (offsetIndex + 1.5),
+		eA = ob.eleAngle * (b + l + 0.05) + 6/360 * 2*Math.PI* (offsetIndex + 1.5);
+		for (var j = b; j < b + l; j++) {
+			tempRate.top.push(window.normalRate.topNormal[j]);
+			tempRate.bottom.push(window.normalRate.bottomNormal[j]);
+		};
+		
+		var rateRadar = radar({
+							container: ob.container,
+							startAngle: sA,
+							endAngle: eA,
+							eleAngle: ob.eleAngle,
+							areaBegin: b,
+							areaNum: l,
+							radius: ob.radius,
+							data: tempRate
+					});
+		radarArray.push(rateRadar);
+
+	}
+
+	_wholeRadar.update = function () {
+		for (var i = 0; i < radarArray.length; i++) {
+			var b = ob.beginArray[i].begin,
+				l = ob.beginArray[i].len,
+				tempRate = {top: [], bottom: []};
+			for (var j = b; j < b + l; j++) {
+				tempRate.top.push(window.normalRate.topNormal[j]);
+				tempRate.bottom.push(window.normalRate.bottomNormal[j]);
+			};
+			radarArray[i].update(tempRate);
+		};
+	}
+
+	return _wholeRadar;
 }
 
 /*

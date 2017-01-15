@@ -7,8 +7,9 @@
 	<script type="text/javascript" src="./plug/jquery-1.11.3.min.js"></script>
 	<script type="text/javascript" src="./js/init.js"></script>
 	<script type="text/javascript" src="./js/method.js"></script>
-	<script type="text/javascript" src="./js/arcsMatrix.js"></script>
 	<script type="text/javascript" src="./js/rada.js"></script>
+	<script type="text/javascript" src="./js/arcsMatrix.js"></script>
+	
 	<style>
 		body {
 			position: relative;
@@ -82,19 +83,27 @@
 						beginRadius += (-15*2 -3)
 					}
 					var eleRadius = i == 0 ? 30 : 15;
+					getRate(data[4-i]);
 					var whole = wholeArea({
 									container: svg,
-									tempData: classification(data[i]),
-									vData: categoriesZoneData(vdata[vIndex+i]),
+									tempData: classification(data[4-i]),
+									vData: categoriesZoneData(vdata[vIndex+(4-i)]),
 									beginArray: beginArray,
 									beginRadius: beginRadius,
 									eleRadius: eleRadius,
 									eleAngle: eleAngle,
 									time: timeArray[i]
 								});
+					
 					areaArray.push(whole);
 					
 				};
+				var wholeR = wholeRadar({
+								container: svg,
+								beginArray: beginArray,
+								radius: 80,
+								eleAngle: eleAngle
+							})
 				timeArray[0] = data[timeIndex].时间;
 				if ( !$("g.axisG").length) {
 					var axis = addAxis(svg, [{x: 300 * Math.cos(-Math.PI/2), y: 300 * Math.sin(-Math.PI/2),},{x: 60 * Math.cos(-Math.PI/2), y: 60 * Math.sin(-Math.PI/2),}], timeArray);
@@ -103,10 +112,12 @@
 				setInterval(function (argument) {
 					timeArray = ["now", "-5min", "-10", "-15", "-20"];
 					timeArray[0] = data[timeIndex].时间;
+					getRate(data[4 + timeIndex]);
 					for (var i = 0; i < areaArray.length; i++) {
-						areaArray[i].update(classification(data[i + timeIndex]), categoriesZoneData(vdata[vIndex + i + timeIndex]))
+						areaArray[i].update(classification(data[(4 - i) + timeIndex]), categoriesZoneData(vdata[vIndex + (4 - i) + timeIndex]))
 					};
-					axis.update(timeArray)
+					axis.update(timeArray);
+					wholeR.update()
 					timeIndex ++;
 				}, 5000)
 

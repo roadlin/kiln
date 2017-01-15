@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>温区实时数据展示-弧形图</title>
+	<script type="text/javascript" src="./plug/d3.v3.js"></script>
+	<script type="text/javascript" src="./plug/jquery-1.11.3.min.js"></script>
+	<script type="text/javascript" src="./js/init.js"></script>
+	<script type="text/javascript" src="./js/method.js"></script>
+	<script type="text/javascript" src="./js/arcsMatrix.js"></script>
+	<script type="text/javascript" src="./js/rada.js"></script>
+	<style>
+		body {
+			position: relative;
+		}
+		#tooltip {
+			background-color: rgba(0,0,0,.6);
+			padding: 5px;
+			border-radius: 5px;
+			width: 80px;
+			color: #fff;
+			text-align: left;
+			font-size: 14px;
+			position: absolute;
+			pointer-events: none;
+		}
+
+		#tooltip.hidden {
+			display: none;
+		}
+	</style>
+</head>
+<body>
+	<div id="tooltip" class="hidden">测试</div>
+	<svg width="700" height="700"></svg>
+	<script>
+		var svg = d3.select("svg");
+		var csvStrT = "./csv/temperature.csv", csvStrV = "./csv/voltage-current.csv", index = 0, vIndex = 0;
+		var beginArray = [{begin: 0, len: 9}, {begin: 9, len: 9}, {begin: 18, len: 3}],
+			timeArray = ["now", "-5min", "-10", "-15", "-20"],
+			eleAngle = (2*Math.PI - 2*6/360 * 2*Math.PI - 3*6/360 * 2*Math.PI) / 21;
+
+		var areaArray = [];
+
+		d3.csv(csvStrT, function (error1, data) { 
+
+			d3.csv(csvStrV, function (error2, vdata) {
+
+				while ( (data[index].时间 != vdata[vIndex].时间) && (vIndex < vdata.length)) {
+					vIndex +=1 ;
+				}
+
+				setRing({
+					container: svg,
+					startAngle: 0,
+					endAngle: 2*Math.PI,
+					innerRadius: 235,
+					outerRadius: 305,
+					color: "#FFFBD1"
+				})
+
+				setRing({
+					container: svg,
+					startAngle: 0,
+					endAngle: 2*Math.PI,
+					innerRadius: 86,
+					outerRadius: 225,
+					color: "#ECECEC"
+				})
+
+				var getVData = categoriesZoneData(vdata[vIndex]);
+				var beginRadius = 240, timeIndex = 0;
+				for (var i = 0; i < 5; i++) {			
+
+					if (i <= 1) {
+						beginRadius += (- 30*i - 20*i);
+					}
+					else if (i > 2) {
+						beginRadius += (-15*2 - 3);
+					}
+					else if (i > 1 ) {
+						beginRadius += (-15*2 -3)
+					}
+					var eleRadius = i == 0 ? 30 : 15;
+					var whole = wholeArea({
+									container: svg,
+									tempData: classification(data[i]),
+									vData: categoriesZoneData(vdata[vIndex+i]),
+									beginArray: beginArray,
+									beginRadius: beginRadius,
+									eleRadius: eleRadius,
+									eleAngle: eleAngle,
+									time: timeArray[i]
+								});
+					areaArray.push(whole);
+					
+				};
+				timeArray[0] = data[timeIndex].时间;
+				if ( !$("g.axisG").length) {
+					var axis = addAxis(svg, [{x: 300 * Math.cos(-Math.PI/2), y: 300 * Math.sin(-Math.PI/2),},{x: 60 * Math.cos(-Math.PI/2), y: 60 * Math.sin(-Math.PI/2),}], timeArray);
+				};
+				timeIndex ++;
+				setInterval(function (argument) {
+					timeArray = ["now", "-5min", "-10", "-15", "-20"];
+					timeArray[0] = data[timeIndex].时间;
+					for (var i = 0; i < areaArray.length; i++) {
+						areaArray[i].update(classification(data[i + timeIndex]), categoriesZoneData(vdata[vIndex + i + timeIndex]))
+					};
+					axis.update(timeArray)
+					timeIndex ++;
+				}, 5000)
+
+			});
+		}) 
+
+	</script>
+</body>
+</html>

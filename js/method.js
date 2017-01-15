@@ -1,13 +1,14 @@
 function classification (dataIn) {
 
 	var dataMatrix = [[],[]];
+
 	for (i in dataIn) {
 		if( i.indexOf("温区") != -1 ) {
 			if (i.indexOf("上") != -1) {
-				dataMatrix[0].push(dataIn[i])
+				dataMatrix[0].push(dataIn[i]);
 			}
 			else {
-				dataMatrix[1].push(dataIn[i])
+				dataMatrix[1].push(dataIn[i]);
 			}
 		}
 	};
@@ -31,3 +32,25 @@ function categoriesZoneData (dataIn) {
 	return voData;
 }
 
+function getRate (dataIn) {
+	var param = window.paramObject;
+
+	window.normalRate.totalNumber ++;
+	for (i in dataIn) {
+		if( i.indexOf("温区") != -1 ) {
+			var index = i.slice(0, i.indexOf("温区")) - 1,
+				different = dataIn[i] - paramObject.thresholdT[index];
+
+			if (i.indexOf("上") != -1) {
+				if ( Math.abs(different) <= param.limit ) {
+					window.normalRate.topNormal[index] += 1;
+				}
+			}
+			else {
+				if ( Math.abs(different) <= param.limit ) {
+					window.normalRate.bottomNormal[index] += 1;
+				}
+			}
+		}
+	};
+}

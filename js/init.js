@@ -6,12 +6,17 @@ var paramObject = {
 	// colorM1: d3.rgb(252, 217, 196),
 	// colorM2: d3.rgb(191, 202, 230),
 	// colorB: d3.rgb(16, 54, 103),
-	colorH: ["#F5A89A", "#E54646", "#C50023"],
-	colorL: ["#BFCAE6", "#426EB4", "#184785"],
-	nomalColor: "#83c75d",
+	colorH: ["#FCDAD5", "#EE7C6B", "#DF0029"],
+	colorL: ["#BFCAE6", "#7388C1", "#184785"],
+	nomalColor: "#AFD788",
 	// limit: {warming: 30, constant: 5, cooling: 10},
 	limit: 5,
-	alert: 15
+	alert: 15,
+	normalRate: {
+		totalNumber: 0,
+		topNormal:  [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+		bottomNormal:  [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+	}
 };
 
 $((function (p) {
@@ -27,6 +32,7 @@ $((function (p) {
 		thresholdT: p.thresholdT,
 		thresholdV: p.thresholdV,
 		thresholdA: p.thresholdA,
+		limit: p.limit,
 		alert: a,
 		color:  function (th, value) {
 					if(  th - value > l){
@@ -45,7 +51,7 @@ $((function (p) {
 						if (value - th > 60) {
 							return p.colorH[2]
 						}
-						else if (value - th > 60) {
+						else if (value - th > 30) {
 							return p.colorH[1];
 						}
 						else {
@@ -57,5 +63,6 @@ $((function (p) {
 						return p.nomalColor;
 				}
 	};
+	window.normalRate = p.normalRate;
 
 })(paramObject))

@@ -100,7 +100,6 @@ function radar(ob) {
 		var paintG = c.append("g")
 							.attr("class", type[j] + "Line")
 							.attr("transform", "translate(" + 375 + "," + 375 + ")");
-
 		//处理数据
 		dataBind = dealPoint(dataBind, type[j]);
 

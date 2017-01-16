@@ -594,7 +594,7 @@ function wholeArea (ob) {
 				beginAngle: sA,
 				flag: offsetIndex
 			});
-			
+
 			setRing({
 				container: ob.container,
 				startAngle: sA,

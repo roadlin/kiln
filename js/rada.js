@@ -45,7 +45,7 @@ function radar(ob) {
 	}
 	var group = c.append("g")
 					.attr("class", "radaGroup radaGroup-" + areaBegin)
-					.attr("transform", "translate(" + 350 + "," + 350 + ")")
+					.attr("transform", "translate(" + 375 + "," + 375 + ")")
 
 	for (var j = 0; j < 6; j++) {
 		group.selectAll("path.arc-" + j)
@@ -99,7 +99,7 @@ function radar(ob) {
 		//绘制曲线区域
 		var paintG = c.append("g")
 							.attr("class", type[j] + "Line")
-							.attr("transform", "translate(" + 350 + "," + 350 + ")");
+							.attr("transform", "translate(" + 375 + "," + 375 + ")");
 
 		//处理数据
 		dataBind = dealPoint(dataBind, type[j]);

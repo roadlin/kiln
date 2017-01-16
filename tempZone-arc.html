@@ -33,7 +33,7 @@
 </head>
 <body>
 	<div id="tooltip" class="hidden">测试</div>
-	<svg width="700" height="700"></svg>
+	<svg width="750" height="750"></svg>
 	<script>
 		var svg = d3.select("svg");
 		var csvStrT = "./csv/temperature.csv", csvStrV = "./csv/voltage-current.csv", index = 0, vIndex = 0;
@@ -110,16 +110,19 @@
 				};
 				timeIndex ++;
 				setInterval(function (argument) {
-					timeArray = ["now", "-5min", "-10", "-15", "-20"];
-					timeArray[0] = data[timeIndex].时间;
-					getRate(data[4 + timeIndex]);
-					for (var i = 0; i < areaArray.length; i++) {
-						areaArray[i].update(classification(data[(4 - i) + timeIndex]), categoriesZoneData(vdata[vIndex + (4 - i) + timeIndex]))
-					};
-					axis.update(timeArray);
-					wholeR.update()
-					timeIndex ++;
-				}, 5000)
+					if (timeIndex < data.length) {
+						timeArray = ["now", "-5min", "-10", "-15", "-20"];
+						timeArray[0] = data[timeIndex].时间;
+						getRate(data[4 + timeIndex]);
+						for (var i = 0; i < areaArray.length; i++) {
+							areaArray[i].update(classification(data[(4 - i) + timeIndex]), categoriesZoneData(vdata[vIndex + (4 - i) + timeIndex]))
+						};
+						axis.update(timeArray);
+						wholeR.update()
+						timeIndex ++;
+					}
+					
+				}, 2000)
 
 			});
 		}) 

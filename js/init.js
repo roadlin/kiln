@@ -7,7 +7,7 @@ var paramObject = {
 	// colorM2: d3.rgb(191, 202, 230),
 	// colorB: d3.rgb(16, 54, 103),
 	colorH: ["#FCDAD5", "#EE7C6B", "#DF0029"],
-	colorL: ["#BFCAE6", "#7388C1", "#184785"],
+	colorL: ["#BFCAE6", "#7388C1", "#205AA7"],
 	nomalColor: "#AFD788",
 	// limit: {warming: 30, constant: 5, cooling: 10},
 	limit: 5,

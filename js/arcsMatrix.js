@@ -39,7 +39,7 @@ function arcsMatrix (ob, time) {
 						.attr("class", function (d, i) {
 							return "arcsGroup arcsGroup-" + (dataBind.length - i);
 						})
-						.attr("transform", "translate(" + 350 + "," + 350 + ")");
+						.attr("transform", "translate(" + 375 + "," + 375 + ")");
 
 	var vGroups = c.selectAll("g.vGroup" + " " + "area-" + areaBegin + " t" + time)
 						.data(vDataBind)
@@ -48,7 +48,7 @@ function arcsMatrix (ob, time) {
 						.attr("class", function (d, i) {
 							return "vGroup vGroup-" + (vDataBind.length - i);
 						})
-						.attr("transform", "translate(" + 350 + "," + 350 + ")");
+						.attr("transform", "translate(" + 375 + "," + 375 + ")");
 
 
 	var arc = function (innerRadius, outerRadius, type) {
@@ -274,9 +274,10 @@ function  addTag(ob) {
 		eleAngle = ob.eleAngle,
 		tagData = ob.tagData,
 		beginAngle = ob.beginAngle;
+
 	var group = c.append("g")
 					.attr("class", "tagG")
-					.attr("transform", "translate(350, 350)");
+					.attr("transform", "translate(375, 375)");
 
 	var cloudG = group.selectAll("g.tagCloud" + ob.flag)
 					.data(tagData)
@@ -297,7 +298,7 @@ function  addTag(ob) {
 			.attr("transform", function (d, i) {
 				var index = $(this).parent()[0].getAttribute("dataIndex");
 				var angle = beginAngle + eleAngle*(index) - Math.PI/2;
-				if (i >= 2) {
+				if (i >= 2 || d.length > 3) {
 					angle += eleAngle/2
 					r = ob.radius;
 				}
@@ -329,7 +330,7 @@ function addAxis (container, point, timeArray) {
 	var _axis = {};
 	var axisG = container.append("g")
 					.attr("class", "axisG")
-					.attr("transform", "translate(350, 350)");
+					.attr("transform", "translate(375, 375)");
 	// 绘制箭头
 // 	var defs = axisG.append("defs");  
 //   
@@ -408,6 +409,7 @@ function addAxis (container, point, timeArray) {
 	var tempTime = timeArray[0].split(" ");
 	timeArray[0] = tempTime[0];
 	timeArray.push(tempTime[1]);
+	timeArray.push("设定温度", "1号窑炉");
 	//绘制时间线
 	var timeText = axisG.selectAll("text.timeText")
 						.data(timeArray)
@@ -415,14 +417,21 @@ function addAxis (container, point, timeArray) {
 						.append("text")
 						.attr("class", "timeText")
 						.attr("transform", function (d, i) {
-							var r = [273, 201, 168, 135, 102, 253],	
+							var r = [273, 201, 168, 135, 102, 253, 333, 352],	
 								angle = -90/360 * 2 *Math.PI;
 							return "translate("+ r[i]*Math.cos(angle) + "," + r[i]*Math.sin(angle) +")"
 						})
 						.attr("font-size", "12px")
 						.attr("font-family", "微软雅黑")
 						.attr("font-weight", "bold")
-						.attr("fill", "#555")
+						.attr("fill", function (d, i) {
+							if (i < 6) {
+								return "#555";
+							}
+							else {
+								return "#B7B7B7"
+							}
+						})
 						.attr("text-anchor", "middle")
 						.text(function (d, i) {
 							return d;
@@ -462,7 +471,7 @@ function setRing (ob) {
 		eA = ob.endAngle,
 		color = ob.color,
 		iR = ob.innerRadius,
-		oR = ob.outerRadius ? ob.outerRadius : iR + 20;
+		oR = ob.outerRadius ? ob.outerRadius : iR + 35;
 		name = ob.areaName;
 
 	if ( !color ) {
@@ -505,7 +514,7 @@ function setRing (ob) {
 					.endAngle(eA);
 
 	var areaArc = c.append("g")
-					.attr("transform", "translate(350, 350)")
+					.attr("transform", "translate(375, 375)")
 					.classed("areaArc", true);
 
 	var arcs = areaArc.selectAll("path.arc")
@@ -523,7 +532,7 @@ function setRing (ob) {
 
 		areaArc.append("text")
 				.attr("text-anchor", "middle")
-				.attr("transform", "translate("+ (iR + 5) * Math.cos(textAngle) + "," + (iR + 5) * Math.sin(textAngle) + ") rotate("+ (textAngle*360 / (2 * Math.PI) + 90) + ")")
+				.attr("transform", "translate("+ (iR + 20) * Math.cos(textAngle) + "," + (iR + 20) * Math.sin(textAngle) + ") rotate("+ (textAngle*360 / (2 * Math.PI) + 90) + ")")
 				.attr("font-size", "12px")
 				.attr("font-family", "幼圆")
 				.attr("font-weight", "bold")
@@ -578,13 +587,14 @@ function wholeArea (ob) {
 				tagData.push( "U,I," + "温区" + (j + 1) );
 			};
 			addTag({
-				container: svg,
+				container: ob.container,
 				tagData: tagData,
 				radius: 312,
 				eleAngle: ob.eleAngle,
 				beginAngle: sA,
 				flag: offsetIndex
 			});
+			
 			setRing({
 				container: ob.container,
 				startAngle: sA,
@@ -593,6 +603,17 @@ function wholeArea (ob) {
 				color: area[i].color,
 				areaName: area[i].name
 			});
+
+			addTag({
+				container: ob.container,
+				tagData: window.paramObject.thresholdT.map(function (value, index, array) {
+					return value + "℃"
+				}).slice(b, (b+l)),
+				radius: 335,
+				eleAngle: ob.eleAngle,
+				beginAngle: sA,
+				flag: offsetIndex
+			})
 			
 		}
 

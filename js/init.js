@@ -14,8 +14,9 @@ var paramObject = {
 	alert: 15,
 	normalRate: {
 		totalNumber: 0,
-		topNormal:  [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-		bottomNormal:  [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+		// topNormal:  [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+		alertNumber: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+		trend: [[], [], [], [], [], [], [], [], [], [], [], [], [], [], [], [], [], [], [], [], []]
 	}
 };
 
@@ -34,6 +35,7 @@ $((function (p) {
 		thresholdA: p.thresholdA,
 		limit: p.limit,
 		alert: a,
+		arcAngle: [],
 		color:  function (th, value) {
 					if(  th - value > l){
 						if (th - value > 60) {
@@ -64,5 +66,6 @@ $((function (p) {
 				}
 	};
 	window.normalRate = p.normalRate;
+
 
 })(paramObject))

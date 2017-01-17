@@ -55,6 +55,9 @@ function arcsMatrix (ob, time) {
 		return d3.svg.arc()
 					.startAngle(function (d, i) {
 						if (type == "temp") {
+							if ( !window.paramObject.arcAngle[areaBegin + i] ) {
+								window.paramObject.arcAngle[areaBegin + i] = startAngle + eleAngle * i + eleAngle * 0.5 - Math.PI/2;
+							};
 							return startAngle + eleAngle * i + eleAngle * 0.2;	
 						}
 						// else if (type == "padding") {
@@ -112,6 +115,7 @@ function arcsMatrix (ob, time) {
 						}
 					});
 	}
+
 	//绘制温度颜色块
 	var tempArc = groups.selectAll("path.arc")
 			.data(function (d) {
@@ -161,7 +165,53 @@ function arcsMatrix (ob, time) {
 				d3.select("#tooltip").classed("hidden",true);
 
 			})
-
+			.on("click", function (d, i) {
+				var trend = window.normalRate.trend,
+					cAngle = window.paramObject.arcAngle,
+					contactData = [];
+				for (var j = 0; j < trend.length; j++) {
+					if ( trend[areaBegin + i].join(",") == trend[j].join(",") && (areaBegin + i) != j) {
+						contactData.push(j);
+					}
+				};
+				d3.selectAll("g.radaGroup").classed("hidden", true);
+				$("path.contactLines").remove();
+				$("circle.contactCircle").remove();
+				var contactLines = groups.selectAll("path.contactLines")
+												.data(contactData)
+												.enter()
+												.append("path")
+												.attr("d", function (d, k) {
+													var cR = 85,
+														mPoint = {x: cR * Math.cos(cAngle[areaBegin+i]), y: cR * Math.sin(cAngle[areaBegin+i])},
+														lPoint = {x: (cR - 25) * Math.cos(cAngle[d]), y: (cR - 25) * Math.sin(cAngle[d])};
+													
+													return "M " + mPoint.x + " " + mPoint.y + " Q 0 0 " + lPoint.x + " " + lPoint.y +  " T " + lPoint.x + " " + lPoint.y ; 
+												})
+												.attr("class", "contactLines")
+												.attr("fill", "none")
+												.attr("stroke", "#FCDAD5")
+												.attr("stroke-width", "2px");
+				if (contactData.length) {
+					var contactCircle = groups.append("circle")
+											.attr({
+												"cx": 85 * Math.cos(cAngle[areaBegin+i]),
+												"cy": 85 * Math.sin(cAngle[areaBegin+i]),
+												"r": 3
+											})
+											.attr("class", "contactCircle")
+											.attr("fill", "#EE7C6B");
+				}
+				event.stopPropagation();
+								
+			})
+	if ( !areaBegin ) {
+		setDot(groups, startAngle, 0.05 * eleAngle + 6/360 * 2*Math.PI * 1.5)
+	}
+	else {
+		setDot(groups, startAngle, 0.05 * eleAngle + 6/360 * 2*Math.PI * 0.5)
+	}
+	
 	//初始化两侧电流电压块
 	var typeStr = ["voltage", "current"],
 		colorHex = ["#D7D7D7", "#D7D7D7"];
@@ -309,7 +359,7 @@ function  addTag(ob) {
 					else {
 						angle += (0.15 * eleAngle);
 					}
-					r = ob.radius - 25;
+					r = ob.radius - 45;
 				}				
 				return "translate("+ r*Math.cos(angle) + "," + r*Math.sin(angle) +"), rotate("+ (angle / (2*Math.PI) *360 + 90) + ")";
 			})
@@ -354,32 +404,24 @@ function addAxis (container, point, timeArray) {
 	var r = [270, 205, 172, 139, 106];
 		angle = -Math.PI/2;
 
-	// for (var j = 0; j < 2; j++) {
-
-	// 	if (j == 0) {
-	// 		var tempAngle = - 6/360 * 2*Math.PI * 1.5;
-	// 	}
-	// 	else {
-	// 		var tempAngle = 6/360 * 2*Math.PI * 1.5
-	// 	}
-		var tempAngle = 6/360 * 2*Math.PI * 1.5
-		axisG.selectAll("path.timeLine")
-			.data(timeArray)
-			.enter()
-			.append("path")
-			.attr("class", "timeLine")
-			.attr("d", function (d, i) {
-				var x1 = r[i]*Math.cos(angle - tempAngle),
-					y1 = r[i]*Math.sin(angle - tempAngle),
-					x2 = r[i]*Math.cos(angle + tempAngle),
-					y2 = r[i]*Math.sin(angle + tempAngle);
-				var descriptions = ['M', x1, y1, 'A', r[i], r[i], 0, 0, 1, x2, y2];
-				return descriptions.join(' ');
-			})
-			.attr("fill", "none")
-			.attr("stroke-width", "1px")
-			.attr("stroke", "#aaa")
-			.attr("stroke-dasharray", "2,2")
+		// var tempAngle = 6/360 * 2*Math.PI * 1.5
+		// axisG.selectAll("path.timeLine")
+		// 	.data(timeArray)
+		// 	.enter()
+		// 	.append("path")
+		// 	.attr("class", "timeLine")
+		// 	.attr("d", function (d, i) {
+		// 		var x1 = r[i]*Math.cos(angle - tempAngle),
+		// 			y1 = r[i]*Math.sin(angle - tempAngle),
+		// 			x2 = r[i]*Math.cos(angle + tempAngle),
+		// 			y2 = r[i]*Math.sin(angle + tempAngle);
+		// 		var descriptions = ['M', x1, y1, 'A', r[i], r[i], 0, 0, 1, x2, y2];
+		// 		return descriptions.join(' ');
+		// 	})
+		// 	.attr("fill", "none")
+		// 	.attr("stroke-width", "1px")
+		// 	.attr("stroke", "#aaa")
+		// 	.attr("stroke-dasharray", "2,2")
 		
 
 		// axisG.selectAll("line.timeLine-" + j)
@@ -403,13 +445,11 @@ function addAxis (container, point, timeArray) {
 		// 	.attr("stroke", "#aaa")
 		// 	.attr("stroke-dasharray", "5,5")
 
-	// };
-
 
 	var tempTime = timeArray[0].split(" ");
 	timeArray[0] = tempTime[0];
 	timeArray.push(tempTime[1]);
-	timeArray.push("设定温度", "1号窑炉");
+	timeArray.push("1号窑炉");
 	//绘制时间线
 	var timeText = axisG.selectAll("text.timeText")
 						.data(timeArray)
@@ -417,21 +457,21 @@ function addAxis (container, point, timeArray) {
 						.append("text")
 						.attr("class", "timeText")
 						.attr("transform", function (d, i) {
-							var r = [273, 201, 168, 135, 102, 253, 333, 352],	
+							var r = [273, 201, 168, 135, 102, 253, 335],	
 								angle = -90/360 * 2 *Math.PI;
 							return "translate("+ r[i]*Math.cos(angle) + "," + r[i]*Math.sin(angle) +")"
 						})
-						.attr("font-size", "12px")
-						.attr("font-family", "微软雅黑")
-						.attr("font-weight", "bold")
-						.attr("fill", function (d, i) {
-							if (i < 6) {
-								return "#555";
+						.attr("font-size", function (d, i) {
+							if (i > 5) {
+								return "16px"
 							}
 							else {
-								return "#B7B7B7"
+								return "12px"
 							}
 						})
+						.attr("font-family", "微软雅黑")
+						.attr("font-weight", "bold")
+						.attr("fill", "#555")
 						.attr("text-anchor", "middle")
 						.text(function (d, i) {
 							return d;
@@ -532,7 +572,7 @@ function setRing (ob) {
 
 		areaArc.append("text")
 				.attr("text-anchor", "middle")
-				.attr("transform", "translate("+ (iR + 20) * Math.cos(textAngle) + "," + (iR + 20) * Math.sin(textAngle) + ") rotate("+ (textAngle*360 / (2 * Math.PI) + 90) + ")")
+				.attr("transform", "translate("+ (iR + 22) * Math.cos(textAngle) + "," + (iR + 22) * Math.sin(textAngle) + ") rotate("+ (textAngle*360 / (2 * Math.PI) + 90) + ")")
 				.attr("font-size", "12px")
 				.attr("font-family", "幼圆")
 				.attr("font-weight", "bold")
@@ -586,34 +626,34 @@ function wholeArea (ob) {
 			for (var j = b; j < b+l; j++) {
 				tagData.push( "U,I," + "温区" + (j + 1) );
 			};
-			addTag({
-				container: ob.container,
-				tagData: tagData,
-				radius: 312,
-				eleAngle: ob.eleAngle,
-				beginAngle: sA,
-				flag: offsetIndex
-			});
-
 			setRing({
 				container: ob.container,
 				startAngle: sA,
 				endAngle: eA - ob.eleAngle*0.1,
-				innerRadius: ob.beginRadius + 2*ob.eleRadius + 30,
+				innerRadius: ob.beginRadius + 2*ob.eleRadius + 26,
 				color: area[i].color,
 				areaName: area[i].name
 			});
 
 			addTag({
 				container: ob.container,
-				tagData: window.paramObject.thresholdT.map(function (value, index, array) {
-					return value + "℃"
-				}).slice(b, (b+l)),
-				radius: 335,
+				tagData: tagData,
+				radius: 331,
 				eleAngle: ob.eleAngle,
 				beginAngle: sA,
 				flag: offsetIndex
-			})
+			});
+
+			// addTag({
+			// 	container: ob.container,
+			// 	tagData: window.paramObject.thresholdT.map(function (value, index, array) {
+			// 		return "设" + value + "℃"
+			// 	}).slice(b, (b+l)),
+			// 	radius: 342,
+			// 	eleAngle: ob.eleAngle,
+			// 	beginAngle: sA,
+			// 	flag: offsetIndex
+			// })
 			
 		}
 
@@ -631,6 +671,34 @@ function wholeArea (ob) {
 
 	return _wholeArea;
 
+}
+
+/*
+	绘制虚线
+*/
+function setDot (container, angle, tempAngle) {
+	var r = [270, 205, 172, 139, 106];
+		angle = -Math.PI/2 + (angle - tempAngle);
+
+	var tempAngle = 6/360 * 2*Math.PI * 1.5;
+
+	container.selectAll("path.timeLine")
+			.data(timeArray)
+			.enter()
+			.append("path")
+			.attr("class", "timeLine")
+			.attr("d", function (d, i) {
+				var x1 = r[i]*Math.cos(angle - tempAngle),
+					y1 = r[i]*Math.sin(angle - tempAngle),
+					x2 = r[i]*Math.cos(angle + tempAngle),
+					y2 = r[i]*Math.sin(angle + tempAngle);
+				var descriptions = ['M', x1, y1, 'A', r[i], r[i], 0, 0, 1, x2, y2];
+				return descriptions.join(' ');
+			})
+			.attr("fill", "none")
+			.attr("stroke-width", "1px")
+			.attr("stroke", "#aaa")
+			.attr("stroke-dasharray", "2,2")
 }
 
 /*画出整个雷达图
@@ -655,8 +723,8 @@ function wholeRadar (ob) {
 		sA= ob.eleAngle * (b + 0.05) + 6/360 * 2*Math.PI* (offsetIndex + 1.5),
 		eA = ob.eleAngle * (b + l + 0.05) + 6/360 * 2*Math.PI* (offsetIndex + 1.5);
 		for (var j = b; j < b + l; j++) {
-			tempRate.top.push(window.normalRate.topNormal[j]);
-			tempRate.bottom.push(window.normalRate.bottomNormal[j]);
+			tempRate.top.push(window.normalRate.alertNumber[j]);
+			// tempRate.bottom.push(window.normalRate.bottomNormal[j]);
 		};
 		
 		var rateRadar = radar({
@@ -679,8 +747,8 @@ function wholeRadar (ob) {
 				l = ob.beginArray[i].len,
 				tempRate = {top: [], bottom: []};
 			for (var j = b; j < b + l; j++) {
-				tempRate.top.push(window.normalRate.topNormal[j]);
-				tempRate.bottom.push(window.normalRate.bottomNormal[j]);
+				tempRate.top.push(window.normalRate.alertNumber[j]);
+				// tempRate.bottom.push(window.normalRate.bottomNormal[j]);
 			};
 			radarArray[i].update(tempRate);
 		};

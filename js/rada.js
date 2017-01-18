@@ -62,47 +62,54 @@ function radar(ob) {
 	};
 
 	//处理数据
-	function dealPoint (d, attr) {
-		var paintD = "0,0 ";
-		var dataBind = d;
-		var threshold = window.normalRate.totalNumber;
-		dataBind[attr + "Points"] = [];
-		for (var i = 0; i < dataBind[attr].length; i++) {
-			var value = dataBind[attr][i],
-	    		r = value / threshold * radius,
-	    		angle = startAngle + eleAngle * (i + 0.5) - Math.PI/2;	
+	// function dealPoint (d, attr) {
+	// 	var paintD = "0,0 ";
+	// 	var dataBind = d;
+	// 	dataBind[attr + "Points"] = [];
+	// 	for (var i = 0; i < dataBind[attr].length; i++) {
+	// 		var r, value = dataBind[attr][i],
+	//     		angle = startAngle + eleAngle * (i + 0.5) - Math.PI/2;	
 
-	    	// var x = r * Math.cos(angle),
-	    	// 	y = r * Math.sin(angle);
-	    	// paintD += x + ',' + y + ' ';
-			// dataBind[attr + "Points"].push({
-			// 	x: x,
-			// 	y: y
-			// });
-			dataBind[attr + "Points"].push(r);
-		};
-		dataBind[attr + "PaintD"] = paintD;
-		return dataBind;
-	}
+	//     	// if (value < 0) {
+	//     	// 	r = 0;
+	//     	// }
+	//     	// else if (value > 2) {
+	//     	// 	r =  radius;
+	//     	// }
+	//     	// else {
+	//     	// 	r = value / 2 * radius;
+	//     	// }
+	//     	// var x = r * Math.cos(angle),
+	//     	// 	y = r * Math.sin(angle);
+	//     	// paintD += x + ',' + y + ' ';
+	// 		// dataBind[attr + "Points"].push({
+	// 		// 	x: x,
+	// 		// 	y: y
+	// 		// });
+	// 		dataBind[attr + "Points"].push(value);
+	// 	};
+	// 	dataBind[attr + "PaintD"] = paintD;
+	// 	return dataBind;
+	// }
 	var type = ["top", "bottom"], polygons = [], circlePoint = [];
 
 	//绘制曲线函数
-	for (var j = 0; j < type.length; j++) {
-		if (type[j] == "bottom") {
-			var color = "#63c9f3",
-				fillColor = "rgba(99, 201, 243, .6)";
-		}
-		else {
-			var color = "#F6B297",
-				fillColor = "rgba(246, 178, 151, 1)";
-		}
+	// for (var j = 0; j < type.length; j++) {
+		// if (type[j] == "bottom") {
+		// 	var color = "#63c9f3",
+		// 		fillColor = "rgba(99, 201, 243, .6)";
+		// }
+		// else {
+		// 	var color = "#F6B297",
+		// 		fillColor = "rgba(246, 178, 151, 1)";
+		// }
 		 
 		//绘制曲线区域
 		var paintG = c.append("g")
-							.attr("class", "radaGroup " + type[j] + "Line")
+							.attr("class", "radaGroup " + "Line")
 							.attr("transform", "translate(" + 375 + "," + 375 + ")");
 		//处理数据
-		dataBind = dealPoint(dataBind, type[j]);
+		// dataBind = dealPoint(dataBind, type[j]);
 
 		//绘制曲线图
 		// var polygon = paintG.append("polygon")
@@ -126,13 +133,31 @@ function radar(ob) {
 		// 				})
 		// polygons.push(polygon);
 		var polygon =  paintG.selectAll("path.arcPoint")
-							.data(dataBind[type[j] + "Points"])
+							.data(dataBind)
 							.enter()
 							.append("path")
 							.attr("d", function (d, i) {
-								return arc(d)(1, i)
+								// console.log(d)
+								if (d < 0) {
+						    		r = 0;
+						    	}
+						    	else if (d >= 2) {
+						    		r =  radius;
+						    	}
+						    	else {
+						    		r = d / 2 * radius;
+						    	}
+						    	// console.log(r)
+								return arc(r)(1, i)
 							})
-							.attr("fill", color)
+							.attr("fill", function (d, i) {
+								if (d < 1.33) {
+									return "#F6B297";
+								}
+								else {
+									return "#98D0B9";
+								}
+							})
 							.attr("stroke-width", "1px")
 							.attr("stroke", "#dbdede")
 							.on("mouseover", function () {
@@ -140,7 +165,7 @@ function radar(ob) {
 								var ty = d3.event.y;
 								
 								d3.select("#tooltip")
-										.html("报警分布情况")
+										.html("CPK值<br>绿色为CAPABLE<br>红色为NOT CAPABLE<br>值为0代表超出正常范围")
 										.style("left",lx + 'px')
 										.style("top",ty + 'px')
 										.style("width","auto")
@@ -149,7 +174,7 @@ function radar(ob) {
 							.on("mouseout",function (d,i) {
 								d3.select("#tooltip").classed("hidden",true);
 							})
-		polygons.push(polygon);
+		// polygons.push(polygon);
 
 		//绘制曲线上的点
 		// var circles = paintG.append('g')
@@ -168,20 +193,38 @@ function radar(ob) {
 		// 						.attr("fill", "#fff")
 		// 						.attr('stroke', color);
 		// circlePoint.push(circle)
-	}
+	// }
 
 	// paintCurve("top");	//上温区电压
 	// paintCurve("bottom");	//下温区电压
 
 	_radar.update = function (rateData) {
 		
-		for (var i = 0; i < type.length; i++) {
-			var dataBind = dealPoint(rateData, type[i]);
-			polygons[i].data(dataBind[type[i] + "Points"])
+		// for (var i = 0; i < type.length; i++) {
+			// var dataBind = dealPoint(rateData, type[i]);
+			polygon.data(rateData)
 				.transition()
 				.duration(500)
 				.attr("d", function (d, i) {
-					return arc(d)(1, i)
+					// console.log(d)
+					if (d < 0) {
+						r = 0;
+					}
+					else if (d >= 2) {
+						r =  radius;
+					}
+					else {
+						r = d / 2 * radius;
+					}
+					return arc(r)(1, i)
+				})
+				.attr("fill", function (d, i) {
+					if (d < 1.33) {
+						return "#F6B297";
+					}
+					else {
+						return "#98D0B9";
+					}
 				})
 				// .attr("points", dataBind[type[i] + "PaintD"]);
 
@@ -194,7 +237,7 @@ function radar(ob) {
 			// 	.attr('cy', function(d) {
 			// 		return d.y;
 			// 	})
-		};
+		// };
 		
 	}
 

@@ -10,12 +10,14 @@ var paramObject = {
 	colorL: ["#BFCAE6", "#7388C1", "#205AA7"],
 	nomalColor: "#AFD788",
 	// limit: {warming: 30, constant: 5, cooling: 10},
-	limit: 5,
+	limit: 10,
 	alert: 15,
 	normalRate: {
 		totalNumber: 0,
 		// topNormal:  [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
 		alertNumber: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+		total: [{top: 0, bottom: 0}, {top: 0, bottom: 0}, {top: 0, bottom: 0}, {top: 0, bottom: 0}, {top: 0, bottom: 0}, {top: 0, bottom: 0}, {top: 0, bottom: 0}, {top: 0, bottom: 0}, {top: 0, bottom: 0}, {top: 0, bottom: 0}, {top: 0, bottom: 0}, {top: 0, bottom: 0}, {top: 0, bottom: 0}, {top: 0, bottom: 0}, {top: 0, bottom: 0}, {top: 0, bottom: 0}, {top: 0, bottom: 0}, {top: 0, bottom: 0}, {top: 0, bottom: 0}, {top: 0, bottom: 0}, {top: 0, bottom: 0}],
+		cpkData: [{top: [], bottom: []}, {top: [], bottom: []}, {top: [], bottom: []}, {top: [], bottom: []}, {top: [], bottom: []}, {top: [], bottom: []}, {top: [], bottom: []}, {top: [], bottom: []}, {top: [], bottom: []}, {top: [], bottom: []}, {top: [], bottom: []}, {top: [], bottom: []}, {top: [], bottom: []}, {top: [], bottom: []}, {top: [], bottom: []}, {top: [], bottom: []}, {top: [], bottom: []}, {top: [], bottom: []}, {top: [], bottom: []}, {top: [], bottom: []}, {top: [], bottom: []}],
 		trend: [[], [], [], [], [], [], [], [], [], [], [], [], [], [], [], [], [], [], [], [], []]
 	}
 };

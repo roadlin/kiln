@@ -82,9 +82,12 @@
 					outerRadius: 225,
 					color: "#ECECEC"
 				})
+				for (var i = 0; i < 100; i++) {
+					cpkData(data[i], "add");
+				};
 
 				var getVData = categoriesZoneData(vdata[vIndex]);
-				var beginRadius = 240, timeIndex = 0;
+				var beginRadius = 240, timeIndex = 99;
 				for (var i = 0; i < 5; i++) {			
 
 					if (i <= 1) {
@@ -97,11 +100,11 @@
 						beginRadius += (-15*2 -3)
 					}
 					var eleRadius = i == 0 ? 30 : 15;
-					getRate(data[4-i], "add");
+					// cpkData(data[timeIndex-i], "add");
 					var whole = wholeArea({
 									container: svg,
-									tempData: classification(data[4-i]),
-									vData: categoriesZoneData(vdata[vIndex+(4-i)]),
+									tempData: classification(data[timeIndex-i]),
+									vData: categoriesZoneData(vdata[vIndex+(timeIndex-i)]),
 									beginArray: beginArray,
 									beginRadius: beginRadius,
 									eleRadius: eleRadius,
@@ -111,13 +114,14 @@
 					areaArray.push(whole);
 					
 				};
-				changeTrend(4, data);
+				changeTrend(timeIndex, data);
 				var wholeR = wholeRadar({
 								container: svg,
 								beginArray: beginArray,
 								radius: 70,
 								eleAngle: eleAngle
 							})
+
 				timeArray[0] = data[timeIndex].时间;
 				if ( !$("g.axisG").length) {
 					var axis = addAxis(svg, [{x: 300 * Math.cos(-Math.PI/2), y: 300 * Math.sin(-Math.PI/2),},{x: 60 * Math.cos(-Math.PI/2), y: 60 * Math.sin(-Math.PI/2),}], timeArray);
@@ -130,24 +134,24 @@
 						timeArray[0] = data[timeIndex].时间;
 
 						var now = new Date(timeArray[0]).getTime(),
-							recordIndex = window.normalRate.totalNumber/2,
-							begin = new Date(data[4 + timeIndex - recordIndex].时间).getTime();
-						if (now - begin > 3600 * 24 * 1000) {
-							getRate(data[timeIndex - recordIndex], "sub");
-						};
+							recordIndex = window.normalRate.totalNumber,
+							begin = new Date(data[timeIndex - recordIndex].时间).getTime();
 
-						getRate(data[4 + timeIndex], "add");
-						changeTrend(4 + timeIndex, data);
+						if (now - begin > 3600 * 24 * 1000) {
+							cpkData(data[timeIndex - recordIndex], "sub");
+						}
+						cpkData(data[timeIndex], "add");
+						changeTrend(timeIndex, data);
 
 						for (var i = 0; i < areaArray.length; i++) {
-							areaArray[i].update(classification(data[(4 - i) + timeIndex]), categoriesZoneData(vdata[vIndex + (4 - i) + timeIndex]))
+							areaArray[i].update(classification(data[(timeIndex - i)]), categoriesZoneData(vdata[vIndex + (timeIndex - i)]))
 						};
 						axis.update(timeArray);
 						wholeR.update()
 						timeIndex ++;
 					}
 					
-				}, 5000)
+				}, 3000)
 
 			});
 		}) 

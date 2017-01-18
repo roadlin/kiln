@@ -170,10 +170,14 @@ function arcsMatrix (ob, time) {
 					cAngle = window.paramObject.arcAngle,
 					contactData = [];
 				for (var j = 0; j < trend.length; j++) {
-					if ( trend[areaBegin + i].join(",") == trend[j].join(",") && (areaBegin + i) != j) {
-						contactData.push(j);
+					var pearsonNum = pearson(trend[areaBegin + i], trend[j]);
+					// console.log(pearsonNum)
+					if (  Math.abs(pearsonNum) > 0.3 && (areaBegin + i) != j) {
+						contactData.push({pNum: pearsonNum, area: j});
 					}
 				};
+				// alert( JSON.stringify(trend[areaBegin + i]))
+				// console.log(contactData)
 				d3.selectAll("g.radaGroup").classed("hidden", true);
 				$("path.contactLines").remove();
 				$("circle.contactCircle").remove();
@@ -184,14 +188,33 @@ function arcsMatrix (ob, time) {
 												.attr("d", function (d, k) {
 													var cR = 85,
 														mPoint = {x: cR * Math.cos(cAngle[areaBegin+i]), y: cR * Math.sin(cAngle[areaBegin+i])},
-														lPoint = {x: (cR - 25) * Math.cos(cAngle[d]), y: (cR - 25) * Math.sin(cAngle[d])};
+														lPoint = {x: (cR - 25) * Math.cos(cAngle[d.area]), y: (cR - 25) * Math.sin(cAngle[d.area])};
 													
 													return "M " + mPoint.x + " " + mPoint.y + " Q 0 0 " + lPoint.x + " " + lPoint.y +  " T " + lPoint.x + " " + lPoint.y ; 
 												})
 												.attr("class", "contactLines")
 												.attr("fill", "none")
-												.attr("stroke", "#FCDAD5")
-												.attr("stroke-width", "2px");
+												.attr("stroke", function (d, i) {
+													if(d.pNum >= 0) {
+														return "#FCDAD5"
+													}
+													else {
+														return "#7388C1";
+													}
+												})
+												.attr("stroke-width", function (d, i) {
+													var abs = Math.abs(d.pNum)
+													if (abs < 0.6) {
+														return　"1px"
+													}
+													else if (abs < 0.8) {
+														return "3px"
+													}
+													else {
+														return "5px"
+													}
+													// return ( 1 - Math.abs(d.pNum)) / 0.2 + "px"
+												});
 				if (contactData.length) {
 					var contactCircle = groups.append("circle")
 											.attr({
@@ -572,7 +595,7 @@ function setRing (ob) {
 
 		areaArc.append("text")
 				.attr("text-anchor", "middle")
-				.attr("transform", "translate("+ (iR + 22) * Math.cos(textAngle) + "," + (iR + 22) * Math.sin(textAngle) + ") rotate("+ (textAngle*360 / (2 * Math.PI) + 90) + ")")
+				.attr("transform", "translate("+ (iR + 20) * Math.cos(textAngle) + "," + (iR + 20) * Math.sin(textAngle) + ") rotate("+ (textAngle*360 / (2 * Math.PI) + 90) + ")")
 				.attr("font-size", "12px")
 				.attr("font-family", "幼圆")
 				.attr("font-weight", "bold")
@@ -718,14 +741,16 @@ function wholeRadar (ob) {
 		var b = ob.beginArray[i].begin,
 			l = ob.beginArray[i].len,
 			offsetIndex = i,
-			tempRate = {top: [], bottom: []};
+			tempRate = [];
 
 		sA= ob.eleAngle * (b + 0.05) + 6/360 * 2*Math.PI* (offsetIndex + 1.5),
 		eA = ob.eleAngle * (b + l + 0.05) + 6/360 * 2*Math.PI* (offsetIndex + 1.5);
 		for (var j = b; j < b + l; j++) {
-			tempRate.top.push(window.normalRate.alertNumber[j]);
+			var cpk = cpkCount (window.normalRate.cpkData[j], window.normalRate.total[j], window.paramObject.thresholdT[j])
+			tempRate.push(cpk);
 			// tempRate.bottom.push(window.normalRate.bottomNormal[j]);
 		};
+		// console.log(tempRate)
 		
 		var rateRadar = radar({
 							container: ob.container,
@@ -745,13 +770,17 @@ function wholeRadar (ob) {
 		for (var i = 0; i < radarArray.length; i++) {
 			var b = ob.beginArray[i].begin,
 				l = ob.beginArray[i].len,
-				tempRate = {top: [], bottom: []};
+				tempRate = [];
 			for (var j = b; j < b + l; j++) {
-				tempRate.top.push(window.normalRate.alertNumber[j]);
-				// tempRate.bottom.push(window.normalRate.bottomNormal[j]);
+				var cpk = cpkCount (window.normalRate.cpkData[j], window.normalRate.total[j], window.paramObject.thresholdT[j])
+				tempRate.push(cpk);
 			};
-			radarArray[i].update(tempRate);
+			// console.log(tempRate)
+			// if (window.normalRate.cpkData[0].top.length > 100) {
+				radarArray[i].update(tempRate);
+			// }			
 		};
+		
 	}
 
 	return _wholeRadar;

@@ -10,7 +10,7 @@ var paramObject = {
 	colorL: ["#BFCAE6", "#7388C1", "#205AA7"],
 	nomalColor: "#AFD788",
 	// limit: {warming: 30, constant: 5, cooling: 10},
-	limit: 10,
+	limit: 5,
 	alert: 15,
 	normalRate: {
 		totalNumber: 0,

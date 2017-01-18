@@ -43,23 +43,72 @@ function radar(ob) {
 					.innerRadius(0)
 					.outerRadius(outerRadius);
 	}
+
+	var getRadius = function (d) {
+		if (d < 0) {
+			return 0;
+		}
+		else if (d < 0.5 && d > 0) {
+			return radius / 5;
+		}
+		else if (d >= 2) {
+			return radius;
+		}
+		else {
+			return d / 2 * radius;
+		}
+	}
+	var getColor = function (d) {
+		if (d < 1.33) {
+			return "#F6B297";
+		}
+		else if (d >= 1.67){
+			return "#98D0B9";
+		}
+		else {
+			return "#FFFAB3";
+		}
+	}
+
+
 	var group = c.append("g")
 					.attr("class", "radaGroup radaGroup-" + areaBegin)
 					.attr("transform", "translate(" + 375 + "," + 375 + ")")
 
-	for (var j = 0; j < 6; j++) {
-		group.selectAll("path.arc-" + j)
-			.data(areaPart)
-			.enter()
-			.append("path")
-			.attr("d", function (d, i) {
-				var partRadius = radius/6 * (j + 1);
-				return arc(partRadius)(d, i)
-			})
-			.attr("fill", "#dbdede")
-			.attr("stroke-width", "1px")
-			.attr("stroke", "#d5d5d5")
-	};
+	// for (var j = 0; j < 6; j++) {
+	var bgArc =	group.selectAll("path.arc")
+						.data(dataBind)
+						.enter()
+						.append("path")
+						.attr("d", function (d, i) {
+							// var partRadius = radius/6 * (j + 1);
+							return arc(radius)(1, i)
+						})
+						.attr("fill", "#ECECEC")
+						.attr("stroke-width", "1px")
+						.attr("stroke", "#dbdede")
+						.on("mouseover", function (d, i) {
+							var lx = d3.event.x;
+							var ty = d3.event.y;
+							if (d < 0) {
+								d = 0;
+							}
+							if (d > 2) {
+								d = 2;
+							}
+											
+							d3.select("#tooltip")
+								.html((i + areaBegin + 1) + "温区" + "CPK值: "+ d.toFixed(2) + "<br>" + "计算范围：2 days"  +"<br>黄色：EVERY CAPABLE<br>绿色：CAPABLE<br>红色：NOT CAPABLE<br>(值为0代表超出正常范围)")
+								.style("left",lx + 'px')
+								.style("top",ty + 'px')
+								.style("width","auto")
+								.style("font-size", ".5em")
+								.classed("hidden",false);
+						})
+						.on("mouseout",function (d,i) {
+							d3.select("#tooltip").classed("hidden",true);
+						})
+	// };
 
 	//处理数据
 	// function dealPoint (d, attr) {
@@ -137,38 +186,30 @@ function radar(ob) {
 							.enter()
 							.append("path")
 							.attr("d", function (d, i) {
-								// console.log(d)
-								if (d < 0) {
-						    		r = 0;
-						    	}
-						    	else if (d >= 2) {
-						    		r =  radius;
-						    	}
-						    	else {
-						    		r = d / 2 * radius;
-						    	}
 						    	// console.log(r)
-								return arc(r)(1, i)
+								return arc(getRadius(d))(1, i)
 							})
 							.attr("fill", function (d, i) {
-								if (d < 1.33) {
-									return "#F6B297";
-								}
-								else {
-									return "#98D0B9";
-								}
+								return getColor(d);
 							})
 							.attr("stroke-width", "1px")
-							.attr("stroke", "#dbdede")
-							.on("mouseover", function () {
+							.attr("stroke", "#ECECEC")
+							.on("mouseover", function (d, i) {
+
 								var lx = d3.event.x;
 								var ty = d3.event.y;
-								
+								if (d < 0) {
+									d = 0;
+								}
+								if (d > 2) {
+									d = 2;
+								}
 								d3.select("#tooltip")
-										.html("CPK值<br>绿色为CAPABLE<br>红色为NOT CAPABLE<br>值为0代表超出正常范围")
+										.html((i + areaBegin + 1) + "温区" + "CPK值: "+ d.toFixed(2) + "<br>" + "计算范围：2 days"  +"<br>黄色：EVERY CAPABLE<br>绿色：CAPABLE<br>红色：NOT CAPABLE<br>(值为0代表超出正常范围)")
 										.style("left",lx + 'px')
 										.style("top",ty + 'px')
 										.style("width","auto")
+										.style("font-size", ".5em")
 										.classed("hidden",false);
 							})
 							.on("mouseout",function (d,i) {
@@ -202,29 +243,15 @@ function radar(ob) {
 		
 		// for (var i = 0; i < type.length; i++) {
 			// var dataBind = dealPoint(rateData, type[i]);
+			bgArc.data(rateData);
 			polygon.data(rateData)
 				.transition()
 				.duration(500)
 				.attr("d", function (d, i) {
-					// console.log(d)
-					if (d < 0) {
-						r = 0;
-					}
-					else if (d >= 2) {
-						r =  radius;
-					}
-					else {
-						r = d / 2 * radius;
-					}
-					return arc(r)(1, i)
+					return arc(getRadius(d))(1, i)
 				})
 				.attr("fill", function (d, i) {
-					if (d < 1.33) {
-						return "#F6B297";
-					}
-					else {
-						return "#98D0B9";
-					}
+					return getColor(d);
 				})
 				// .attr("points", dataBind[type[i] + "PaintD"]);
 

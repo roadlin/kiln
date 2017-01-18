@@ -373,7 +373,7 @@ function  addTag(ob) {
 				var angle = beginAngle + eleAngle*(index) - Math.PI/2;
 				if (i >= 2 || d.length > 3) {
 					angle += eleAngle/2
-					r = ob.radius;
+					r = ob.radius - 5;
 				}
 				else {
 					if (i == 0) {
@@ -653,7 +653,7 @@ function wholeArea (ob) {
 				container: ob.container,
 				startAngle: sA,
 				endAngle: eA - ob.eleAngle*0.1,
-				innerRadius: ob.beginRadius + 2*ob.eleRadius + 26,
+				innerRadius: ob.beginRadius + 2*ob.eleRadius + 20,
 				color: area[i].color,
 				areaName: area[i].name
 			});

@@ -126,8 +126,8 @@ function cpkCount (arr, total, th) {
 		cpk += cp * (1 - Math.abs(ca));
 		// console.log(arr[item], cpk)
 	}
-
-	return cpk/2
+	// console.log(arr, total, th)
+	return cpk/2;
 }
 
 /*获得变化趋势*/

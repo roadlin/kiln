@@ -153,6 +153,7 @@ function arcsMatrix (ob, time) {
 						.style("left",lx + 'px')
 						.style("top",ty + 'px')
 						.style("width","auto")
+						.style("font-size", "14px")
 						.classed("hidden",false);
 
 			})

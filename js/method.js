@@ -233,20 +233,21 @@ function pearsonItem (arr1, arr2) {
 		return preValue + curValue;	
 	}
 	function getSumPower(preValue,curValue,index, array) {
+		if (index == 1) {
+			return Math.pow(preValue, 2) + Math.pow(curValue, 2)
+		};
 		return preValue + Math.pow(curValue, 2);
 	}
-	var sum1 = arr1.reduce(getSum, 0),
-		sum2 = arr2.reduce(getSum, 0),
-		sum1Sq = arr1.reduce(getSumPower, 0),
-		sum2Sq = arr2.reduce(getSumPower, 0),
+	var sum1 = arr1.reduce(getSum),
+		sum2 = arr2.reduce(getSum),
+		sum1Sq = arr1.reduce(getSumPower),
+		sum2Sq = arr2.reduce(getSumPower),
 		pSum = arr1.reduce(function (preValue,curValue,index, array) {
-			// if (si[index] == 1) {
+				if (index == 1) {
+					return preValue * arr2[index - 1] + curValue * arr2[index]
+				};
 				return preValue + curValue * arr2[index];
-			// }
-			// else {
-			// 	return preValue;
-			// };
-		}, 0);
+		});
 	
 	var num = pSum - (sum1 * sum2) / n;
 		den = Math.sqrt((sum1Sq - Math.pow(sum1, 2) / n) * (sum2Sq - Math.pow(sum2, 2) / n));

@@ -1,3 +1,3 @@
 # kiln
-## If you want to browse online, please click on the following link, and if it does not work, you can copy the following link to your Google Chrome to open ##
+## 使用径向仪表盘的设计方式可视化辊道窑炉 21 个温区的温度、电压和电流 ##
 - http://htmlpreview.github.io/?https://github.com/roadlin/kiln/blob/master/tempZone-arc.html
